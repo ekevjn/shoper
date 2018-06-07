@@ -24,17 +24,17 @@ app.get('/', function (req, res) {
 })
 
 // for Facebook verification
-app.get('/webhook/', function (req, res) {
-	let messaging_events = req.body.entry[0].messaging
+app.get('/webhook', function (req, res) {
+	let messaging_events = req.body.entry[0].messaging;
 	for (let i = 0; i < messaging_events.length; i++) {
-		let event = req.body.entry[0].messaging[i]
-		let sender = event.sender.id
+		let event = req.body.entry[0].messaging[i];
+		let sender = event.sender.id;
 		if (event.message && event.message.text) {
-			let text = event.message.text
-			sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
+			let text = event.message.text;
+			sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200));
 		}
 	}
-	res.sendStatus(200)
+	res.sendStatus(200);
 })
 
 app.post('/webhook', (req, res) => {
@@ -134,7 +134,7 @@ function callSendAPI(sender_psid, response) {
 	request({
 		"uri": "https://graph.facebook.com/v2.6/me/messages",
 		"qs": {
-			"access_token": PAGE_ACCESS_TOKEN
+			"access_token": 'EAACrt0LSQ20BAOZBgPAyvgZAcm7iWIwWQlWRpO9iQglsAIhuMurS27652t3NLrvzVji0kabE78GkKZCoecNcocqL647kZAuQHJ6ueCTSANrSY76sJykWUT7qQmGD1mFqZAzYuZBRxZAqgVdZCxWTYc00VNdeZARYrSjWdom4iVK67zRfRr7f638BK'
 		},
 		"method": "POST",
 		"json": request_body
