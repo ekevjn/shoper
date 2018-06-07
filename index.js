@@ -4,7 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
-const PAGE_ACCESS_TOKEN = process.env.VERIFY_TOKEN;
+const PAGE_ACCESS_TOKEN = process.env.VERIFY_TOKEN	;
 
 app.set('port', (process.env.PORT || 5000))
 
@@ -37,6 +37,7 @@ app.post('/webhook', (req, res) => {
 
 	// Parse the request body from the POST
 	let body = req.body;
+	console.log(req);
   
 	// Check the webhook event is from a Page subscription
 	if (body.object === 'page') {
