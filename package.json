@@ -2,7 +2,7 @@
   "name": "botapi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "mongo:start": "docker run --name realworld-mongo -p 27017:27017 mongo & sleep 5",
     "start": "node ./app.js",
