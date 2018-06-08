@@ -28,7 +28,7 @@ if (!isProduction) {
 }
 
 if(isProduction){
-  mongoose.connect(process.env.MONGODB_URI);
+  mongoose.connect('mongodb://admin:admin_123@cluster0-shard-00-00-w58yo.mongodb.net:27017,cluster0-shard-00-01-w58yo.mongodb.net:27017,cluster0-shard-00-02-w58yo.mongodb.net:27017/Product?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true');
 } else {
   mongoose.connect('mongodb://admin:admin_123@cluster0-shard-00-00-w58yo.mongodb.net:27017,cluster0-shard-00-01-w58yo.mongodb.net:27017,cluster0-shard-00-02-w58yo.mongodb.net:27017/Product?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true');
   mongoose.set('debug', true);
