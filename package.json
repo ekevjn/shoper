@@ -9,13 +9,17 @@
     "dev": "nodemon ./app.js",
     "test": "newman run ./tests/api-tests.postman.json -e ./tests/env-api-tests.postman.json",
     "stop": "lsof -ti :3000 | xargs kill",
-    "mongo:stop": "docker stop realworld-mongo && docker rm realworld-mongo"
+    "mongo:stop": "docker stop realworld-mongo && docker rm realworld-mongo",
+    "build": "babel src/ -d lib/",
+    "prepublish": "npm run build",
+    "flow": "flow"
   },
   "author": "vu dang trung",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
     "cors": "2.7.1",
+    "crawler": "^1.1.4",
     "errorhandler": "1.4.3",
     "express": "^4.16.3",
     "method-override": "^2.3.10",
@@ -23,16 +27,20 @@
     "mongoose": "^5.1.4",
     "mongoose-unique-validator": "1.0.2",
     "morgan": "^1.9.0",
+    "osmosis": "^1.1.6",
     "request": "^2.87.0",
     "slug": "0.9.1",
     "underscore": "1.8.3"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
+    "flow-bin": "^0.74.0",
     "newman": "^3.8.2",
     "nodemon": "^1.11.0"
   }

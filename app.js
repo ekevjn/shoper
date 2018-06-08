@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use(require('method-override')());
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/src/public'));
 
 
 if (!isProduction) {
@@ -36,7 +36,7 @@ if(isProduction){
 
 // require('./models/User');
 
-app.use(require('./routes'));
+app.use(require('./src/routes'));
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
