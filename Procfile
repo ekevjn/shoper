@@ -1,1 +1,1 @@
-web: with_ngrok node --inspect=3000 app.js
+web: node app.js
