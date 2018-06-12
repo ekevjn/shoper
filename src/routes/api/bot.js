@@ -54,11 +54,14 @@ function firstEntity(nlp, name) {
 function handleMessage(sender_psid, received_message) {
 
 	let response;
-	console.info(received_message.text);
+	console.info('================== N L P ==================');
+	console.info(received_message.nlp);
 
 	// Check if the message contains text
 	if (received_message.text) {
 		const greeting = firstEntity(received_message.nlp, 'greetings');
+		console.info('================== greeting ==================');
+		console.info(greeting);
 		if (greeting && greeting.confidence > 0.8) {
 			response = {
 				"text": `Hi there`
