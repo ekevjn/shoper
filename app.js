@@ -5,9 +5,12 @@ var http = require('http'),
     bodyParser = require('body-parser'),
     cors = require('cors'),
     errorhandler = require('errorhandler'),
+    schedule = require('node-schedule'),
     mongoose = require('mongoose');
 
 var isProduction = process.env.NODE_ENV === 'production';
+
+const DB_CONNECTION_PROD = process.env.DB_CONNECTION_PROD;
 
 // Create global app object
 var app = express();
@@ -28,13 +31,19 @@ if (!isProduction) {
 }
 
 if(isProduction){
-  mongoose.connect('mongodb://admin:admin_123@cluster0-shard-00-00-w58yo.mongodb.net:27017,cluster0-shard-00-01-w58yo.mongodb.net:27017,cluster0-shard-00-02-w58yo.mongodb.net:27017/Product?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true');
+  mongoose.connect(DB_CONNECTION_PROD);
 } else {
-  mongoose.connect('mongodb://admin:admin_123@cluster0-shard-00-00-w58yo.mongodb.net:27017,cluster0-shard-00-01-w58yo.mongodb.net:27017,cluster0-shard-00-02-w58yo.mongodb.net:27017/Product?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true');
+  mongoose.connect('mongodb://admin:admin_123@cluster0-shard-00-00-w58yo.mongodb.net:27017,cluster0-shard-00-01-w58yo.mongodb.net:27017,cluster0-shard-00-02-w58yo.mongodb.net:27017/Product?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin');
   mongoose.set('debug', true);
 }
 
-// require('./models/User');
+require('./src/models/Product');
+
+const crawler = require('./src/jobs/crawler');
+crawler();
+
+// Schedule for crawler
+// var j = schedule.scheduleJob('23 * * *', crawler);
 
 app.use(require('./src/routes'));
 

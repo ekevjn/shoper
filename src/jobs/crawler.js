@@ -5,22 +5,11 @@
 const mongoose = require('mongoose'),
     osmosis = require('osmosis'),
     randomUseragent = require('random-useragent'),
-    router = require('express').Router();
-const KID_PLAZA_URL = 'www.kidsplaza.vn';
+    Product = mongoose.model('Product'),
+    KID_PLAZA_URL = 'www.kidsplaza.vn';
 
-router.get('/kidsplaza', (req, res) => {
-
-    crawl(res);
-    // getKidsPlazaDepartments().then(data => {
-    //     res.status(200).send(data);
-    // }, err => {
-    //     res.status(500).send(err);
-    // })
-});
-
-async function crawl(callback) {
+async function crawl() {
     const departments = await getKidsPlazaDepartments();
-    callback.status(200).send(departments);
     if (departments && Array.isArray(departments) && departments.length > 0) {
         for (let i = 1; i < departments.length; i++) {
             cronJob(departments[i].link);
@@ -64,8 +53,13 @@ async function getProductsDetail(URLs){
         console.error(err);
         if(err.message.includes('retrying')){
             console.info('Retrying: '.concat(err.link));
-            product = await getProductDetail(URLs[i].link);
+            getProductsDetail([err]);
         }
+    }
+    if(product.sku){
+        Product.createOrUpdate(product, err => {
+            if (err) console.error(err);
+        })
     }
 }
 
@@ -183,4 +177,4 @@ function getKidsPlazaNextPage(departmentURL) {
     });
 }
 
-module.exports = router;
+module.exports = crawl;
