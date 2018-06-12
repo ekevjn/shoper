@@ -1,1 +1,1 @@
-web: with_ngrok node --debug=3000 server.js
+web: with_ngrok node --inspect=3000 server.js
