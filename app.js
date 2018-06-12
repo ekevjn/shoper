@@ -43,7 +43,7 @@ const crawler = require('./src/jobs/crawler');
 crawler();
 
 // Schedule for crawler
-// var j = schedule.scheduleJob('23 * * *', crawler);
+var j = schedule.scheduleJob('23 * * *', crawler);
 
 app.use(require('./src/routes'));
 
