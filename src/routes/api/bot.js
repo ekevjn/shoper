@@ -54,6 +54,7 @@ function firstEntity(nlp, name) {
 function handleMessage(sender_psid, received_message) {
 
 	let response;
+	console.info(received_message.text);
 
 	// Check if the message contains text
 	if (received_message.text) {

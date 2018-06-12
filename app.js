@@ -40,7 +40,7 @@ if(isProduction){
 require('./src/models/Product');
 
 const crawler = require('./src/jobs/crawler');
-crawler();
+// crawler();
 
 // Schedule for crawler
 var j = schedule.scheduleJob('23 * * *', crawler);
