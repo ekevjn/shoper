@@ -3,6 +3,7 @@
 // Imports dependencies and set up http server
 const
 	mongoose = require('mongoose'),
+	request = require('request'),
 	router = require('express').Router();
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
@@ -55,7 +56,7 @@ function handleMessage(sender_psid, received_message) {
 
 	let response;
 	console.info('================== N L P ==================');
-	console.info(received_message.nlp);
+	// console.info(received_message.nlp);
 
 	// Check if the message contains text
 	if (received_message.text) {
@@ -87,7 +88,7 @@ function callSendAPI(sender_psid, response) {
 		"recipient": {
 			"id": sender_psid
 		},
-		"message": response
+		"message": response.text
 	}
 
 	// Send the HTTP request to the Messenger Platform

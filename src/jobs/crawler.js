@@ -9,7 +9,12 @@ const mongoose = require('mongoose'),
     KID_PLAZA_URL = 'www.kidsplaza.vn';
 
 async function crawl() {
-    const departments = await getKidsPlazaDepartments();
+    let departments;
+    try{
+        departments = await getKidsPlazaDepartments();
+    } catch (err) {
+        console.error(err);
+    }
     if (departments && Array.isArray(departments) && departments.length > 0) {
         for (let i = 1; i < departments.length; i++) {
             cronJob(departments[i].link);
