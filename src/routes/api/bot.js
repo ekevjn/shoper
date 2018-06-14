@@ -4,6 +4,8 @@
 const
 	mongoose = require('mongoose'),
 	request = require('request'),
+	Product = mongoose.model('Product'),
+	sysConfig = require('../../config'),
 	router = require('express').Router();
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
@@ -52,34 +54,108 @@ function firstEntity(nlp, name) {
 	return nlp && nlp.entities && nlp.entities[name] && nlp.entities[name][0];
 }
 
-function handleMessage(sender_psid, received_message) {
+function confidence(entity, score) {
+	return entity && entity.confidence > (score ? score : 0.5);
+}
+
+async function handleMessage(sender_psid, received_message) {
 
 	let response;
-	console.info('================== N L P ==================');
-	// console.info(received_message.nlp);
 
 	// Check if the message contains text
 	if (received_message.text) {
-		response = {
-			"text": `You sent the message: "${received_message.text}". Now send me an image!`
+		const greeting = firstEntity(received_message.nlp, 'greeting');
+		const askingForHelp = firstEntity(received_message.nlp, 'ask_for_search');
+		if (confidence(greeting, 0.8)) {
+			response = {
+				"text": `Chào bạn, mình có thể giúp gì cho bạn?`
+			}
+		} else if (confidence(askingForHelp)) {
+			response = {
+				"text": `Bạn cần mình tìm sản phẩm nào?`
+			}
+		} else {
+			// Create the payload for a basic text message
+			const _query = new RegExp(received_message.text, "i")
+			try {
+				response = await searchProduct(_query);
+			} catch (err) {
+				response = {
+					text: err
+				}
+			}
 		}
-		// const greeting = firstEntity(received_message.nlp, 'greetings');
-		// console.info('================== greeting ==================');
-		// console.info(greeting);
-		// if (greeting && greeting.confidence > 0.8) {
-		// 	response = {
-		// 		"text": `Hi there`
-		// 	}
-		// } else {
-		// 	// Create the payload for a basic text message
-		// 	response = {
-		// 		"text": `You sent the message: "${received_message.text}". Now send me an image!`
-		// 	}
-		// }
+		// Sends the response message
+		if(Array.isArray(response)){
+			response.forEach(res => callSendAPI(sender_psid, res));
+		} else {
+			callSendAPI(sender_psid, response);
+		}
+		console.info('Response: ', response);
 	}
+}
 
-	// Sends the response message
-	callSendAPI(sender_psid, response);
+function searchProduct(query) {
+	return new Promise((resolve, reject) => {
+		let response;
+		Product.find({
+				$or: [{
+					'name': query
+				}, {
+					'brand': query
+				}]
+			})
+			.limit(10)
+			.sort('price')
+			.select('name brand price imageSrc url')
+			.exec((err, doc) => {
+				response = {
+					"text": `Rất tiếc cửa hàng chúng tôi không có sản phần mà bạn cần tìm! `
+				}
+				if (err) {
+					console.error(err);
+					reject("Xin lỗi máy chủ đang gặp sự cố, vui lòng thử lại sau!");
+				} else if (doc && doc.length > 0) {
+					const response = {
+						attachment: {
+							type: 'template',
+							payload: {
+								template_type: 'generic',
+								elements: []
+							}
+						}
+					}
+					doc.forEach(val => {
+						const responseElement = {
+							title: val.name,
+							image_url: 'https:'.concat(val.imageSrc),
+							subtitle: val.brand.concat('\n',val.price),
+							default_action: {
+								type: 'web_url',
+								url: val.url,
+								webview_height_ratio: 'tall'
+							},
+							buttons: [
+								{
+									type: 'web_url',
+									url: val.url,
+									title: 'Chi Tiết'
+								},
+								{
+									type: 'web_url',
+									url: 'https://www.kidsplaza.vn/',
+									title: 'Xem thêm'
+								}
+							]
+						}
+						response.attachment.payload.elements.push(responseElement);
+					});
+					resolve(response);
+				} else {
+					resolve(response);
+				}
+			});
+	})
 }
 
 function callSendAPI(sender_psid, response) {
@@ -88,20 +164,21 @@ function callSendAPI(sender_psid, response) {
 		"recipient": {
 			"id": sender_psid
 		},
-		"message": response.text
+		"message": response
 	}
 
 	// Send the HTTP request to the Messenger Platform
 	request({
 		"uri": "https://graph.facebook.com/v2.6/me/messages",
 		"qs": {
-			"access_token": PAGE_ACCESS_TOKEN
+			"access_token": sysConfig.PAGE_ACCESS_TOKEN
 		},
 		"method": "POST",
 		"json": request_body
 	}, (err, res, body) => {
 		if (!err) {
 			console.log('message sent!')
+			console.info(res)
 		} else {
 			console.error("Unable to send message:" + err);
 		}

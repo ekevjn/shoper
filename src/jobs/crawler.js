@@ -99,6 +99,7 @@ function getProductDetail(URL) {
             })
             .data(function (product) {
                 product.sku = product.sku.split(':')[1].trim();
+                product.url = URL;
                 resolve(product);
             })
             .log(console.log)
